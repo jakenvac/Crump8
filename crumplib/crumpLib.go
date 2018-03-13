@@ -1,31 +1,11 @@
-package main
+package crumplib
 
 import (
 	"fmt"
 )
 
-// the set of fonts to be loaded into memory
-var fontSet = [80]byte{
-	0xf0, 0x90, 0x90, 0x90, 0xf0, // 0
-	0x20, 0x60, 0x20, 0x20, 0x70, // 1
-	0xf0, 0x10, 0xf0, 0x80, 0xf0, // 2
-	0xf0, 0x10, 0xf0, 0x10, 0x10, // 3
-	0x90, 0x90, 0xf0, 0x10, 0x10, // 4
-	0xf0, 0x80, 0xf0, 0x10, 0xf0, // 5
-	0xf0, 0x80, 0xf0, 0x90, 0xf0, // 6
-	0xf0, 0x10, 0x20, 0x40, 0x40, // 7
-	0xf0, 0x90, 0xf0, 0x90, 0xf0, // 8
-	0xf0, 0x90, 0xf0, 0x10, 0xf0, // 9
-	0xf0, 0x90, 0xf0, 0x90, 0x90, // A
-	0xe0, 0x90, 0xe0, 0x90, 0xe0, // B
-	0xf0, 0x80, 0x80, 0x80, 0xf0, // C
-	0xe0, 0x90, 0x90, 0x90, 0xe0, // D
-	0xF0, 0x80, 0xf0, 0x80, 0xf0, // E
-	0xf0, 0x80, 0xf0, 0x80, 0x80, // F
-}
-
 // This file contains the definition of the 'hardware' of the Chip8
-type chip8 struct {
+type crump8 struct {
 	// An array to hold all 4096 bytes of ram
 	ram [4096]byte
 	// 2D array of pixels that can be either on or off
@@ -50,9 +30,10 @@ type chip8 struct {
 	draw bool
 }
 
-func newChip8(rom []byte) *chip8 {
+// Create a new instance of the Crump8 Emulator
+func NewCrump8(rom []byte) *crump8 {
 	fmt.Println("Initializing Chip8")
-	c := &chip8{
+	c := &crump8{
 		pc:           0x200,
 		opcode:       0,
 		i:            0,
@@ -78,7 +59,7 @@ func newChip8(rom []byte) *chip8 {
 }
 
 // This emulates one cycle of the cpu
-func (c *chip8) cycle() {
+func (c *crump8) cycle() {
 	// As opcodes are two bytes long we fetch two bytes from memory and merge them by shifting the first byte left 8 bits and or-ing it with the next byte
 	c.opcode = uint16(c.ram[c.pc])<<8 | uint16(c.ram[c.pc+1])
 
@@ -114,6 +95,6 @@ func (c *chip8) cycle() {
 
 }
 
-func (c *chip8) keys() {
+func (c *crump8) keys() {
 	fmt.Print("Not Implemented")
 }
