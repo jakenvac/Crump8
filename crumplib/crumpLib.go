@@ -5,7 +5,9 @@ import (
 )
 
 // This file contains the definition of the 'hardware' of the Chip8
-type crump8 struct {
+
+// Crump8 defines the format of the chip8
+type Crump8 struct {
 	// An array to hold all 4096 bytes of ram
 	ram [4096]byte
 	// 2D array of pixels that can be either on or off
@@ -30,52 +32,51 @@ type crump8 struct {
 	draw bool
 }
 
-// Create a new instance of the Crump8 Emulator
-func NewCrump8(rom []byte) *crump8 {
-	fmt.Println("Initializing Chip8")
-	c := &crump8{
+// NewCrump8 Creates a new instance of the Crump8 Emulator
+func NewCrump8(rom []byte) *Crump8 {
+	LogWrite("Initializing Chip8")
+	c := &Crump8{
 		pc:           0x200,
 		opcode:       0,
 		i:            0,
 		stackPointer: 0,
 	}
 
-	fmt.Println("Loading font...")
+	LogWrite("Loading font...")
 	// load the font into memory
 	for i := 0; i < 80; i++ {
 		c.ram[i] = fontSet[i]
 	}
 
-	fmt.Println("Loading ROM")
+	LogWrite("Loading ROM")
 	// load the rom into memory from byte 512 onwards
 	for i := 0; i < len(rom); i++ {
 		c.ram[i+512] = rom[i]
 	}
 
-	fmt.Println("Chip8 Initialized. Printing memory dump:")
-	fmt.Println(c.ram)
+	LogWrite("Chip8 Initialized. Printing memory dump:")
+	//LogWrite(string(c.ram[:len(c.ram)]))
 
 	return c
 }
 
-// This emulates one cycle of the cpu
-func (c *crump8) cycle() {
+// This emulates one cycle of the cpu and returns the delta time between each cycle
+func (c *Crump8) cycle() float32 {
 	// As opcodes are two bytes long we fetch two bytes from memory and merge them by shifting the first byte left 8 bits and or-ing it with the next byte
 	c.opcode = uint16(c.ram[c.pc])<<8 | uint16(c.ram[c.pc+1])
 
 	// fetch ex
 	switch c.opcode & 0xF000 {
-	case 0xA000: // ANNN sets I to address NNN
-		c.i = c.opcode & 0x0FFF
-		c.pc += 2
+	case 0xA000: // ANNN
+		c.opANNN()
 	case 0x2000:
-		c.stack[c.stackPointer] = c.pc
-		c.stackPointer++
-		c.pc = c.opcode & 0x0FFF
+		c.op2NNN()
+	case 0x1000:
+		c.op1NNN()
 	case 0x0000: // For more opcodes
 		switch c.opcode & 0x000F {
-		case 0x000: // Clear the screen
-			// Execute
+		case 0x00E0: // Clear the screen
+			c.op00E0()
 		case 0x0004: // 0x8XY4 sets adds vX to vY
 			vx := (c.opcode & 0x00f0) >> 4
 			vy := (c.opcode & 0x0f00) >> 8
@@ -93,8 +94,10 @@ func (c *crump8) cycle() {
 		fmt.Printf("No opcode of: %x\n", c.opcode)
 	}
 
+	return 0
 }
 
-func (c *crump8) keys() {
-	fmt.Print("Not Implemented")
+// Keys will detect key presses on the Chip 8
+func (c *Crump8) Keys() {
+	//fmt.Print("Not Implemented")
 }

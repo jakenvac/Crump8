@@ -15,6 +15,11 @@ func main() {
 		panic(err)
 	}
 
-	/* chip := */
-	crumplib.NewCrump8(rom)
+	//crumplib.LogWriter = os.Stdout
+
+	c8 := crumplib.NewCrump8(rom)
+
+	for {
+
+	}
 }
