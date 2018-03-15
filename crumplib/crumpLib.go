@@ -60,38 +60,39 @@ func NewCrump8(rom []byte) *Crump8 {
 	return c
 }
 
-// This emulates one cycle of the cpu and returns the delta time between each cycle
-func (c *Crump8) cycle() float32 {
+// Cycle emulates one cycle of the cpu and returns the delta time between each cycle
+func (c *Crump8) Cycle() float32 {
 	// As opcodes are two bytes long we fetch two bytes from memory and merge them by shifting the first byte left 8 bits and or-ing it with the next byte
 	c.opcode = uint16(c.ram[c.pc])<<8 | uint16(c.ram[c.pc+1])
 
-	// fetch ex
+	// TODO Remove
+	c.opcode = 0x8224
+
+	// fetch execute
 	switch c.opcode & 0xF000 {
-	case 0xA000: // ANNN
+	case 0xA000:
 		c.opANNN()
 	case 0x2000:
 		c.op2NNN()
 	case 0x1000:
 		c.op1NNN()
+	case 0x8000:
+		switch c.opcode & 0x000F {
+		case 0x0000:
+			c.op8XY0()
+		case 0x0004:
+			c.op8XY4()
+		}
 	case 0x0000: // For more opcodes
 		switch c.opcode & 0x000F {
-		case 0x00E0: // Clear the screen
+		case 0x0000: // Clear the screen
 			c.op00E0()
-		case 0x0004: // 0x8XY4 sets adds vX to vY
-			vx := (c.opcode & 0x00f0) >> 4
-			vy := (c.opcode & 0x0f00) >> 8
-			if c.v[vx] > (0xFF - c.v[vy]) {
-				c.v[0xf] = 1
-			} else {
-				c.v[0xf] = 0
-			}
-			c.v[vy] += c.v[vx]
-			c.pc += 2
-		case 0x00E:
-			// Execute
+		case 0x000E:
+			c.op00EE()
 		}
 	default:
-		fmt.Printf("No opcode of: %x\n", c.opcode)
+		msg := fmt.Sprintf("Invalid opcode: %x", c.opcode)
+		LogWrite(msg)
 	}
 
 	return 0

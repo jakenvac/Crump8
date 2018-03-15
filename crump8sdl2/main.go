@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/JakeHL/crump8/crumplib"
 )
@@ -15,11 +16,11 @@ func main() {
 		panic(err)
 	}
 
-	//crumplib.LogWriter = os.Stdout
+	crumplib.LogWriter = os.Stdout
 
 	c8 := crumplib.NewCrump8(rom)
 
 	for {
-
+		c8.Cycle()
 	}
 }

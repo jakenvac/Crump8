@@ -15,7 +15,7 @@ func (c *Crump8) op00EE() {
 
 }
 
-// 1NNN jumpts to address at NNN
+// 1NNN jumps to address at NNN
 func (c *Crump8) op1NNN() {
 
 }
@@ -54,27 +54,45 @@ func (c *Crump8) op7XNN() {
 
 // 8XY0 Sets VX to VY
 func (c *Crump8) op8XY0() {
-
+	vx, vy := getXY(c.opcode)
+	c.v[vx] = c.v[vy]
+	c.pc += 2
 }
 
 // 8XY1 sets VX to (VX | VY)
 func (c *Crump8) op8XY1() {
-
+	vx, vy := getXY(c.opcode)
+	c.v[vx] |= c.v[vy]
+	c.pc += 2
 }
 
 // 8XY2 sets VX to (VX & VY)
 func (c *Crump8) op8XY2() {
-
+	vx, vy := getXY(c.opcode)
+	c.v[vx] &= c.v[vy]
+	c.pc += 2
 }
 
 // 8XY3 sets VX to (VX ^ VY)
 func (c *Crump8) op8XY3() {
-
+	vx, vy := getXY(c.opcode)
+	c.v[vx] ^= c.v[vy]
+	c.pc += 2
 }
 
 // 8XY4 Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
 func (c *Crump8) op8XY4() {
-
+	vx, vy := getXY(c.opcode)
+	if c.v[vx] > (0xFF - c.v[vy]) {
+		c.v[0xf] = 1
+	} else {
+		c.v[0xf] = 0
+	}
+	c.v[vy] += c.v[vx]
+	// Increment to the next opcode
+	// We increment by two as each opcode is two bytes long
+	// if we incremented by 1 we'd be on the second half of the same opcode
+	c.pc += 2
 }
 
 // 8XY5 VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
