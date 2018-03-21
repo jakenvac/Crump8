@@ -2,6 +2,8 @@ package crumplib
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 // This file contains the definition of the 'hardware' of the Chip8
@@ -34,6 +36,9 @@ type Crump8 struct {
 
 // NewCrump8 Creates a new instance of the Crump8 Emulator
 func NewCrump8(rom []byte) *Crump8 {
+	seed := time.Now().UnixNano()
+	rand.Seed(seed)
+
 	LogWrite("Initializing Chip8")
 	c := &Crump8{
 		pc:           0x200,
@@ -66,7 +71,9 @@ func (c *Crump8) Cycle() float32 {
 	c.opcode = uint16(c.ram[c.pc])<<8 | uint16(c.ram[c.pc+1])
 
 	// TODO Remove
-	c.opcode = 0x8224
+	c.v[2] = 0xFF
+	c.v[3] = 0x01
+	c.opcode = 0x8234
 
 	// fetch execute
 	switch c.opcode & 0xF000 {
