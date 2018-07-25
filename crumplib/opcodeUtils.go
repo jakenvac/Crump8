@@ -12,6 +12,7 @@ func getXY(opcode uint16) (byte, byte) {
 	return getX(opcode), getY(opcode)
 }
 
+// This could be wrong
 func getMsb(byteval byte) byte {
 	var old byte = 0x1
 	var new byte = 0x0
