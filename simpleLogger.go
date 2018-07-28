@@ -1,4 +1,4 @@
-package crumplib
+package crump8
 
 import "io"
 

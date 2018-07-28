@@ -1,4 +1,4 @@
-package crumplib
+package crump8
 
 // the set of fonts to be loaded into memory
 var fontSet = [80]byte{
