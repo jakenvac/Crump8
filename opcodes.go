@@ -212,12 +212,10 @@ func (c *Chip8) opDXYN() {
 		for x := uint16(0); x < width; x++ {
 			if pixelRow&(0x80>>x) != 0 {
 				pixel := &c.gfx[vy+y][vx+x]
-				if *pixel {
+				*pixel = !*pixel
+				if !*pixel {
 					c.V[0xF] = 1
-				} else {
-					c.V[0xF] = 0
 				}
-				*pixel = (*pixel || true) && !(*pixel && true)
 			}
 		}
 	}
